@@ -1,13 +1,14 @@
 <?php
-// Démarre la session pour vérifier l'authentification
+// Dï¿½marre la session pour vï¿½rifier l'authentification
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Fonction pour protéger une page (redirection si pas authentifié)
-function protegerPage() {
+// Fonction pour protï¿½ger une page (redirection si pas authentifiï¿½)
+function protegerPage()
+{
     if (!isset($_SESSION['user_id'])) {
-        $_SESSION['error'] = 'Veuillez vous connecter pour accéder à cette page.';
+        $_SESSION['error'] = 'Veuillez vous connecter pour accï¿½der ï¿½ cette page.';
         header('Location: index.php');
         exit;
     }
@@ -32,18 +33,18 @@ function protegerPage() {
 <body>
 
     <nav class="navbar navbar-expand-lg bg-dark navbar-dark px-3">
-        <a class="navbar-brand me-4" href="index.php">Épicerie</a>
+        <a class="navbar-brand me-4" href="index.php">Epicerie</a>
 
         <div class="navbar-nav ms-auto">
             <?php if (isset($_SESSION['user_id'])): ?>
-                <!-- Affiche les liens si authentifié -->
+                <!-- Affiche les liens si authentifiï¿½ -->
                 <a class="nav-link mx-2" href="produits.php">Produits</a>
                 <a class="nav-link mx-2" href="statistiques.php">Statistiques</a>
                 <a class="nav-link mx-2" href="compte.php">Mon compte</a>
-                <span class="nav-link mx-2 text-muted">Connecté: <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
-                <a class="nav-link mx-2" href="logout.php">Déconnexion</a>
+                <span class="nav-link mx-2 text-muted">Connectï¿½: <?php echo htmlspecialchars($_SESSION['user_name']); ?></span>
+                <a class="nav-link mx-2" href="logout.php">Dï¿½connexion</a>
             <?php else: ?>
-                <!-- Affiche un lien d'accueil si pas authentifié -->
+                <!-- Affiche un lien d'accueil si pas authentifiï¿½ -->
                 <a class="nav-link mx-2" href="index.php">Accueil</a>
             <?php endif; ?>
         </div>

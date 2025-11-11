@@ -107,6 +107,56 @@ include("./includes/header.php");
                 console.error(err);
             });
     });
+
+    // Ouvre le modal de création de compte
+    document.getElementById('openRegister')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('registerModal').style.display = 'flex';
+    });
+
+    // Ferme le modal de création de compte
+    document.getElementById('closeRegisterModal')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('registerModal').style.display = 'none';
+    });
+
+    // Gestion du formulaire de création de compte
+    document.getElementById('registerForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var form = e.target;
+        var errorDiv = document.getElementById('registerError');
+        var fd = new FormData(form);
+        errorDiv.style.display = 'none';
+        if (fd.get('password') !== fd.get('confirm_password')) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerText = 'Les mots de passe ne correspondent pas.';
+            return;
+        }
+        fetch('register.php', {
+                method: 'POST',
+                body: fd
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('registerModal').style.display = 'none';
+                    window.location.reload();
+                } else {
+                    errorDiv.style.display = 'block';
+                    errorDiv.innerText = data.error || 'Erreur lors de la création du compte.';
+                }
+            })
+            .catch(err => {
+                errorDiv.style.display = 'block';
+                errorDiv.innerText = 'Erreur réseau';
+            });
+    });
+
+    // Prépare le bouton "Mot de passe oublié ?" (à compléter)
+    document.querySelector('a.text-muted')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        alert('Fonctionnalité à venir : récupération du mot de passe.');
+    });
 </script>
 
 <p class="footer">Copyright by <b> Sariaka RAZAFIMAHEFA</b></p>
