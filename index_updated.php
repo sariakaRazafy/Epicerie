@@ -34,33 +34,33 @@ include("./includes/header.php");
                     </div>
                 </form>
             <?php endif; ?>
+        </div>
 
-            <!-- Modal de création de compte -->
-            <div id="registerModal" style="display:none; position:fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:1050; align-items:center; justify-content:center;">
-                <div style="background:#fff; max-width:400px; width:100%; margin:auto; padding:30px 24px; border-radius:18px; box-shadow:0 0 24px 4px #bbb; position:relative;">
-                    <h4 class="mb-3 text-center">Créer un compte</h4>
-                    <form id="registerForm">
-                        <div class="mb-2">
-                            <label class="form-label">Nom d'utilisateur</label>
-                            <input type="text" name="username" class="form-control" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Adresse e-mail</label>
-                            <input type="email" name="email" class="form-control" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Mot de passe</label>
-                            <input type="password" name="password" class="form-control" required>
-                        </div>
-                        <div class="mb-2">
-                            <label class="form-label">Confirmer le mot de passe</label>
-                            <input type="password" name="confirm_password" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-success w-100">Créer le compte</button>
-                        <div id="registerError" class="text-danger small mt-2" style="display:none;"></div>
-                    </form>
-                    <button type="button" id="closeRegisterModal" class="btn btn-link w-100 mt-2">Annuler</button>
-                </div>
+        <!-- Modal de création de compte -->
+        <div id="registerModal" style="display:none; position:fixed; left:0; top:0; right:0; bottom:0; background:rgba(0,0,0,0.4); z-index:1050; align-items:center; justify-content:center;">
+            <div style="background:#fff; max-width:400px; width:100%; margin:auto; padding:30px 24px; border-radius:18px; box-shadow:0 0 24px 4px #bbb; position:relative;">
+                <h4 class="mb-3 text-center">Créer un compte</h4>
+                <form id="registerForm">
+                    <div class="mb-2">
+                        <label class="form-label">Nom d'utilisateur</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Adresse e-mail</label>
+                        <input type="email" name="email" class="form-control" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Mot de passe</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label">Confirmer le mot de passe</label>
+                        <input type="password" name="confirm_password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Créer le compte</button>
+                    <div id="registerError" class="text-danger small mt-2" style="display:none;"></div>
+                </form>
+                <button type="button" id="closeRegisterModal" class="btn btn-link w-100 mt-2">Annuler</button>
             </div>
         </div>
 
@@ -78,6 +78,42 @@ include("./includes/header.php");
 </div>
 
 <script>
+    // Ouvre le modal de création de compte
+    document.getElementById('openRegister')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('registerModal').style.display = 'flex';
+    });
+
+    // Ferme le modal de création de compte
+    document.getElementById('closeRegisterModal')?.addEventListener('click', function() {
+        document.getElementById('registerModal').style.display = 'none';
+    });
+
+    // Ferme le modal si on clique en dehors
+    document.getElementById('registerModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+
+    // Gestion du formulaire de création de compte
+    document.getElementById('registerForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var form = e.target;
+        var errorDiv = document.getElementById('registerError');
+        var fd = new FormData(form);
+
+        if (fd.get('password') !== fd.get('confirm_password')) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerText = 'Les mots de passe ne correspondent pas.';
+            return;
+        }
+
+        // TODO : Envoyer via AJAX à register.php pour créer le compte
+        alert('Fonctionnalité d\'enregistrement à compléter.');
+        document.getElementById('registerModal').style.display = 'none';
+    });
+
     // Gestion du formulaire de login
     document.getElementById('loginForm')?.addEventListener('submit', function(e) {
         e.preventDefault();

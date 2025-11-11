@@ -6,7 +6,7 @@ include("./includes/header.php");
     <!-- Ligne avec hauteur minimale pour permettre l'alignement top/bottom des images -->
     <div class="row" style="min-height:400px;">
         <!-- Formulaire de login à l'extrême gauche -->
-        <div class="col-12 col-md-3 d-flex justify-content-center align-items-center">
+        <div class="col-12 col-md-3 d-flex justify-content-center align-items-center mt-3 mt-md-5">
             <?php if (isset($_SESSION['user_id'])): ?>
                 <!-- Affichage si l'utilisateur est connecté -->
                 <div class="text-center">
@@ -78,6 +78,42 @@ include("./includes/header.php");
 </div>
 
 <script>
+    // Ouvre le modal de création de compte
+    document.getElementById('openRegister')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        document.getElementById('registerModal').style.display = 'flex';
+    });
+
+    // Ferme le modal de création de compte
+    document.getElementById('closeRegisterModal')?.addEventListener('click', function() {
+        document.getElementById('registerModal').style.display = 'none';
+    });
+
+    // Ferme le modal si on clique en dehors
+    document.getElementById('registerModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.style.display = 'none';
+        }
+    });
+
+    // Gestion du formulaire de création de compte
+    document.getElementById('registerForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var form = e.target;
+        var errorDiv = document.getElementById('registerError');
+        var fd = new FormData(form);
+
+        if (fd.get('password') !== fd.get('confirm_password')) {
+            errorDiv.style.display = 'block';
+            errorDiv.innerText = 'Les mots de passe ne correspondent pas.';
+            return;
+        }
+
+        // TODO : Envoyer via AJAX à register.php pour créer le compte
+        alert('Fonctionnalité d\'enregistrement à compléter.');
+        document.getElementById('registerModal').style.display = 'none';
+    });
+
     // Gestion du formulaire de login
     document.getElementById('loginForm')?.addEventListener('submit', function(e) {
         e.preventDefault();
