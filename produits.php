@@ -15,7 +15,7 @@ $result = $cnx->query($sql);
             <!-- Barre de titre, recherche et bouton d'ajout avec fond gris clair -->
             <div class="bg-light p-3 mb-3 border rounded" style="background-color: #f5f5f5;">
                 <div class="d-flex align-items-center justify-content-between">
-                    <h3 class="mb-0 me-3">Produits disponibles</h3>
+                    <h3 class="mb-0 me-3" id="produitdispo">Produits disponibles</h3>
                     <input id="searchInput" type="text" class="form-control me-2" placeholder="Rechercher un produit..." style="max-width: 400px;">
                     <button id="openAddBtn" class="btn btn-primary">Ajouter un produit</button>
                 </div>
@@ -63,7 +63,7 @@ $result = $cnx->query($sql);
                                         <input id="qty-<?php echo $prod['id']; ?>" data-unite="<?php echo htmlspecialchars($prod['unite'] ?? 'unité', ENT_QUOTES); ?>" type="number" min="1" step="1" value="1" class="form-control form-control-sm">
                                     </div>
                                     <!-- Quantité pour le client -->
-                                    <button class="btn btn-success btn-sm w-100" onclick="ajouterAuPanier('<?php echo addslashes($prod['nom']); ?>', <?php echo $prod['prix']; ?>, document.getElementById('qty-<?php echo $prod['id']; ?>').value, '<?php echo addslashes($prod['unite'] ?? 'unité'); ?>')">Ajouter</button>
+                                    <button class="btn btn-success btn-sm w-100" onclick="ajouterAuPanier(<?php echo $prod['id']; ?>, '<?php echo addslashes($prod['nom']); ?>', <?php echo $prod['prix']; ?>, document.getElementById('qty-<?php echo $prod['id']; ?>').value, '<?php echo addslashes($prod['unite'] ?? 'unité'); ?>')">Ajouter</button>
                                     <div class="mt-2 d-flex justify-content-between">
                                         <button class="btn btn-outline-secondary btn-sm" onclick="openEditModal(this.closest('.card'))">Modifier</button>
                                         <button class="btn btn-outline-danger btn-sm" onclick="deleteProduct(<?php echo $prod['id']; ?>)">Supprimer</button>
@@ -197,8 +197,8 @@ $result = $cnx->query($sql);
         totalEl.innerText = formatCurrency(total);
     }
 
-    // Ajoute ou met à jour un produit dans le panier
-    function ajouterAuPanier(nom, prix, quantite, unite) {
+    // Ajoute ou met à jour un produit dans le panier (avec id)
+    function ajouterAuPanier(id, nom, prix, quantite, unite) {
         // parse valeurs
         var q = parseFloat(quantite);
         if (isNaN(q) || q <= 0) {
@@ -206,10 +206,10 @@ $result = $cnx->query($sql);
             return;
         }
 
-        // Cherche si produit déjà présent (même nom + unité)
+        // Cherche si produit déjà présent (même id + unité)
         var found = null;
         for (var i = 0; i < cart.length; i++) {
-            if (cart[i].nom === nom && cart[i].unite === unite && cart[i].prix == prix) {
+            if (cart[i].id === id && cart[i].unite === unite && cart[i].prix == prix) {
                 found = i;
                 break;
             }
@@ -219,6 +219,7 @@ $result = $cnx->query($sql);
             cart[found].quantite = parseFloat((cart[found].quantite + q).toFixed(3));
         } else {
             cart.push({
+                id: id,
                 nom: nom,
                 prix: parseFloat(prix),
                 quantite: parseFloat(q),
@@ -387,7 +388,7 @@ $result = $cnx->query($sql);
         adjustCardQtyInputs();
     });
 
-    // Enregistre la vente (simulation, à compléter avec appel AJAX vers PHP)
+    // Enregistre la vente et l'envoie au serveur via enregistrer_vente.php
     function enregistrerVente() {
         var billet = parseFloat(document.getElementById('billetDonne').value) || 0;
         var total = parseFloat(document.getElementById('total').innerText.replace(/\s/g, '').replace(/,/g, '')) || 0;
@@ -404,19 +405,35 @@ $result = $cnx->query($sql);
         var vente = {
             produits: cart,
             total: total,
-            billet: billet,
-            monnaie: monnaie
+            payment_method: 'cash'
         };
-        // TODO : Envoyer vente via AJAX à enregistrer_vente.php pour enregistrer et mettre à jour les stocks
-        alert('Vente enregistrée !\nMonnaie à rendre : ' + monnaie.toLocaleString(undefined, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2
-        }) + ' Ar');
-        // Réinitialise le panier et les champs
-        cart = [];
-        renderCart();
-        document.getElementById('billetDonne').value = '';
-        document.getElementById('monnaieRendre').value = '0';
+
+        fetch('enregistrer_vente.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(vente)
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Vente enregistrée (ID: ' + data.order_id + ').\nMonnaie à rendre : ' + monnaie.toLocaleString(undefined, {
+                        minimumFractionDigits: 0,
+                        maximumFractionDigits: 2
+                    }) + ' Ar');
+                    cart = [];
+                    renderCart();
+                    document.getElementById('billetDonne').value = '';
+                    document.getElementById('monnaieRendre').value = '0';
+                } else {
+                    alert('Erreur enregistrement vente : ' + (data.error || 'inconnue'));
+                }
+            })
+            .catch(err => {
+                alert('Erreur réseau lors de l\'enregistrement');
+                console.error(err);
+            });
     }
 </script>
 

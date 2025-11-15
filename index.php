@@ -26,6 +26,10 @@ include("./includes/header.php");
                         <label class="form-label">Mot de passe</label>
                         <input type="password" id="password" name="password" class="form-control form-control-sm" required>
                     </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" value="1" id="rememberMe" name="remember">
+                        <label class="form-check-label small" for="rememberMe">Se souvenir de moi</label>
+                    </div>
                     <button type="submit" class="btn btn-primary btn-sm w-100 mb-2">Connexion</button>
                     <div id="loginError" class="text-danger small mt-2" style="display:none;"></div>
                     <div class="d-flex justify-content-between align-items-center mt-3">
@@ -85,12 +89,15 @@ include("./includes/header.php");
         var password = document.getElementById('password').value;
         var errorDiv = document.getElementById('loginError');
 
+        // récupère l'option "se souvenir"
+        var remember = document.getElementById('rememberMe') ? document.getElementById('rememberMe').checked : false;
+
         fetch('auth.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 },
-                body: 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password)
+                body: 'username=' + encodeURIComponent(username) + '&password=' + encodeURIComponent(password) + '&remember=' + (remember ? '1' : '0')
             })
             .then(r => r.json())
             .then(data => {
